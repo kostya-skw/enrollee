@@ -219,11 +219,13 @@ class Profile extends \yii\db\ActiveRecord
     public function loadModel($id)
     {
         $profile = Profile::findById($id);
-        $this->id = $profile->id;
-        $this->status= $profile->status;
-        $this->created_at= $profile->created_at;
-        $this->updated_at= $profile->updated_at;
-        $this->attributes = $profile->attributes;
+        if(!empty($profile)) {
+            $this->id = $profile->id;
+            $this->status= $profile->status;
+            $this->created_at= $profile->created_at;
+            $this->updated_at= $profile->updated_at;
+            $this->attributes = $profile->attributes;
+        }
 
     }
 
