@@ -669,44 +669,36 @@ class ProfileForm extends Model
             if (empty($person))
                 $person = new Person();
 
-            $parent1 = Person::findById($person->id_parent1);
 
-            if ((empty($parent1))and(trim($this->parent1_type)!='')) {
-                $parent1 = new Person();
-
-                if ((!empty($parent1)or($parent1->isNewRecord))and(trim($this->parent1_type)!='')) {
-
-                    $parent1->attributes = $this->getMyAttributes('parent1_');
-                    $parent1->save();
-
-                }
-
-            } elseif (!empty($parent1)) {
-
-                $parent1->delete();
-
+            if (trim($this->parent1_type)!='') {
+                $parent1 = Person::findById($person->id_parent1);
+                if (empty($parent1))
+                    $parent1 = new Person();
+                $parent1->attributes = $this->getMyAttributes('parent1_');
+                $parent1->save();
+                $person->id_parent1 = $parent1->id;
+            } else {
+                $parent1 = Person::findById($person->id_parent1);
+                if (!empty($parent1))
+                    $parent1->delete();
+                $person->id_parent1 = null;
             }
 
-            $parent2 = Person::findById($person->id_parent2);
-
-            if ((empty($parent2))and(trim($this->parent2_type)!='')) {
-                $parent2 = new Person();
-
-                if ((!empty($parent2)or($parent2->isNewRecord))and(trim($this->parent2_type)!='')) {
-
-                    $parent2->attributes = $this->getMyAttributes('parent2_');
-                    $parent2->save();
-                }
-
-            } elseif (!empty($parent2)) {
-
-                $parent2->delete();
-
+            if (trim($this->parent2_type)!='') {
+                $parent2 = Person::findById($person->id_parent2);
+                if (empty($parent2))
+                    $parent2 = new Person();
+                $parent2->attributes = $this->getMyAttributes('parent2_');
+                $parent2->save();
+                $person->id_parent2 = $parent2->id;
+            } else {
+                $parent2 = Person::findById($person->id_parent2);
+                if (!empty($parent2))
+                    $parent2->delete();
+                $person->id_parent2 = null;
             }
 
             $person->attributes = $this->attributes;
-            !empty($parent1) ? $person->id_parent1 = $parent1->id : $person->id_parent1 = null;
-            !empty($parent2) ? $person->id_parent2 = $parent2->id : $person->id_parent2 = null;
 
             if ($person->save()) {
 
