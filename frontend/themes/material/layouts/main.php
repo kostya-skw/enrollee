@@ -78,7 +78,7 @@ MaterialAsset::register($this);
     NavBar::end();
     ?>
 
-    <section id="intro-image" class="" style="background-image:url('images/post.jpg');"></section>
+    <section id="intro-image" class="" style="background-image:url('/images/post.jpg');"></section>
 
     <div class="container" style="background-color: #f5f5f5; height: 100%">
         <?= Breadcrumbs::widget([

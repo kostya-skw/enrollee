@@ -12,7 +12,15 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
+    'homeUrl' => '/admin',
     'components' => [
+        'request' => [
+            'baseUrl' => '/admin',
+        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+        ],
         'user' => [
             'identityClass' => 'backend\models\UserBackend',
             'enableAutoLogin' => true,
