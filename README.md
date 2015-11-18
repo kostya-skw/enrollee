@@ -10,6 +10,7 @@ Enrollee
 
 Apache Configuration
 ---
+```
 <VirtualHost *:80>
     ServerName site.name
     #ErrorLog /dev/null
@@ -63,9 +64,11 @@ Apache Configuration
         Satisfy All
     </FilesMatch>
 </VirtualHost>
+```
 
 Nginx Configuration
 ---
+```
 server {
     listen       80; # listen for IPv4
     #listen       [::]:80 ipv6only=on; # listen for IPv6
@@ -121,3 +124,4 @@ server {
         #}
     }
 }
+```
