@@ -72,7 +72,7 @@ Nginx Configuration
 server {
     listen       80; # listen for IPv4
     #listen       [::]:80 ipv6only=on; # listen for IPv6
-    server_name  advanced.local;
+    server_name  site.name;
     root         /path/to/rootdir;
 
     #access_log   off;
