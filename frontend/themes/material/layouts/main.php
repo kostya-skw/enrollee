@@ -60,7 +60,7 @@ MaterialAsset::register($this);
         $menuItems[] = ['label' => '<span class="glyphicon glyphicon-plus-sign"></span> Signup', 'url' => ['/site/signup']];
         $menuItems[] = ['label' => '<span class="glyphicon glyphicon-user"></span> Login', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => '<span class=""></span> Анкета', 'url' => ['/site/profile']];
+        $menuItems[] = ['label' => '<span class=""></span> Анкета', 'url' => ['/profile/my']];
         $menuItems[] = ['label' => '<span class="glyphicon glyphicon-user"></span> '.Yii::$app->user->identity->username, 'items' => [
             ['label' => '<span class="glyphicon glyphicon-"></span> User settings', 'url' => ['/site/user-settings']],
             [
@@ -78,7 +78,7 @@ MaterialAsset::register($this);
     NavBar::end();
     ?>
 
-    <section id="intro-image" class="" style="background-image:url('/images/post.jpg');"></section>
+    <div id="intro-image" style="background-image:url('/images/post.jpg');"></div>
 
     <div class="container" style="background-color: #f5f5f5; height: 100%">
         <?= Breadcrumbs::widget([

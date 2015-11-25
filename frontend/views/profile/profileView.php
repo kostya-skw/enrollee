@@ -287,8 +287,8 @@ $this->title = 'Завяление ';
 
 <?php
 
-$urlEdit = Url::to(['site/return-to-edit'], true);
-$urlPdf = Url::to(['site/profile-to-pdf'], true);
+$urlEdit = Url::to(['profile/return-to-edit'], true);
+$urlPdf = Url::to(['profile/profile-to-pdf'], true);
 
 $script = <<< JS
 
