@@ -11,10 +11,12 @@ use \yii\helpers\Html;
 
 /* @var $this yii\web\View */
 
-$this->title = 'Заявления';
+$this->title = 'Анкеты абитуриентов';
+$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
-<h1>Список заявлений</h1>
+<h1>Список анкет абитуриентов</h1>
 
 <?php echo GridView::widget([
     'dataProvider' => $dataProvider,

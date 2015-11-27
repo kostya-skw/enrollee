@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use common\models\Spec;
 use Yii;
 use yii\db\Query;
+use yii\filters\HttpCache;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -14,6 +15,7 @@ use common\models\ProfileForm;
 use frontend\models\UserFrontend;
 use frontend\models\Agreement;
 use kartik\mpdf\Pdf;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -29,7 +31,14 @@ class ProfileController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['profile', 'return-to-edit', 'profile-to-pdf', 'spec-list', 'spec-items'],
+                'only' => [
+                    'profile',
+                    'return-to-edit',
+                    'profile-to-pdf',
+                    'spec-list',
+                    'spec-items',
+                    'agreement',
+                ],
                 'rules' => [
                     [
                         'actions' => [
@@ -38,6 +47,7 @@ class ProfileController extends Controller
                             'profile-to-pdf',
                             'spec-list',
                             'spec-items',
+                            'agreement',
                         ],
                         'allow' => true,
                         'roles' => ['@'],
@@ -50,6 +60,15 @@ class ProfileController extends Controller
                     'return-to-edit' => ['post'],
                 ],
             ],
+            [
+                'class' => \yii\filters\HttpCache::className(),
+                'only' => ['view'],
+                'lastModified' => function ($action, $params) {
+                    $q = new \yii\db\Query();
+                    return $q->from('profile')->max('updated_at');
+                },
+            ],
+
         ];
     }
 
@@ -69,86 +88,148 @@ class ProfileController extends Controller
         ];
     }
 
+
     /**
-     * Profile.
+     * Agreement.
      *
      * @return mixed
      * @throws BadRequestHttpException
      */
-    public function actionMy()
+    public function actionAgreement()
+    {
+        $id = Yii::$app->getUser()->getId();
+        $user = UserFrontend::findIdentity($id);
+
+        $model = new Agreement();
+        $model->consent_processing_personal_data = $user->consent_processing_personal_data;
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->AcceptConsentProcessingPersonalData()) {
+                if ($model->consent_processing_personal_data==1)
+                    Yii::$app->session->setFlash('success', 'Согласие на обработку персональных данных принято!');
+                return  Yii::$app->getResponse()->redirect(Url::to(['profile/my']));
+            } else {
+                Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
+            }
+        }
+
+        return $this->render('agreement', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Profile index.
+     *
+     * @return mixed
+     * @throws mixed
+     */
+    public function actionIndex()
+    {
+        $id = Yii::$app->getUser()->getId();
+        $user = UserFrontend::findIdentity($id);
+        $profile = new Profile();
+        $profile->loadModel($user->id_profile);
+        return $this->render('index', [
+            'model' => $profile,
+        ]);
+
+    }
+
+    /**
+     * Profile view.
+     *
+     * @return mixed
+     * @throws mixed
+     */
+    public function actionView()
     {
         $id = Yii::$app->getUser()->getId();
         $user = UserFrontend::findIdentity($id);
 
         if ($user->consent_processing_personal_data!=1) {
-
-            $model = new Agreement();
-            if ($model->load(Yii::$app->request->post())) {
-                if ($model->AcceptConsentProcessingPersonalData()) {
-                    Yii::$app->session->setFlash('success', 'Согласие на обработку персональных данных принято!');
-                    return  Yii::$app->getResponse()->redirect(Url::to(['site/profile']));
-                } else {
-                    Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
-                }
-            }
-
-            return $this->render('agreement', [
-                'model' => $model,
-            ]);
-        }
-        else {
+            throw new \yii\web\ForbiddenHttpException('Для продолжения необходимо дать согласие на обработку персональных данных');
+        } else {
 
             $profile = new Profile();
-            $profile->loadModel($user->id_profile);
-
-            if (in_array($profile->status, [Profile::STATUS_NEW])) {
-
-                $model = new ProfileForm();
-                $model->contact_email = $user->email;
-                $model->loadModel($profile->id);
-
-                if ($model->load(Yii::$app->request->post())) {
-
-                    Yii::$app->request->post('submit') == 'save&done' ?
-                        $model->status = Profile::STATUS_REVIEW
-                        : $model->status = Profile::STATUS_NEW;
-
-                    if ($model->save()) {
-
-                        $model->status == Profile::STATUS_REVIEW ?
-                            Yii::$app->session->setFlash('success', 'Сохранено успешно и готово к рассмотрению в приемной комиссии. Не забудьте взять оригиналы документов.')
-                            : Yii::$app->session->setFlash('success', 'Сохранено успешно');
-
-                        $id = Yii::$app->getUser()->getId();
-                        $user = UserFrontend::findIdentity($id);
-                        if ($user->id_profile != $model->id) {
-                            $user->id_profile = $model->id;
-                            $user->save();
-                        }
-
-                        return  Yii::$app->getResponse()->redirect(Url::to(['profile/my']));
-
-                    } else {
-                        Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
-                    }
-                }
-
-
-                $specitems = Profile::getSpecsAllWithChoice($model->edu_base);
-
-                return $this->render('profile', [
-                    'model' => $model,
-                    'specitems' => $specitems,
-                ]);
-
-            } else {
-
+            if ($profile->loadModel($user->id_profile)) {
                 return $this->render('profileView', [
                     'model' => $profile,
                 ]);
-
+            } else {
+                throw new \yii\web\NotFoundHttpException('Анкета не найдена');
             }
+
         }
+
+    }
+
+    /**
+     * Profile edit.
+     *
+     * @return mixed
+     * @throws mixed
+     */
+    public function actionEdit()
+    {
+        $id = Yii::$app->getUser()->getId();
+        $user = UserFrontend::findIdentity($id);
+
+        if ($user->consent_processing_personal_data!=1) {
+            throw new \yii\web\ForbiddenHttpException('Для продолжения необходимо дать согласие на обработку персональных данных');
+        } else {
+
+            $profile = new Profile();
+            if ($profile->loadModel($user->id_profile)) {
+
+                if (in_array($profile->status, [Profile::STATUS_NEW])) {
+
+                    $model = new ProfileForm();
+                    $model->contact_email = $user->email;
+                    $model->loadModel($profile->id);
+
+                    if ($model->load(Yii::$app->request->post())) {
+
+                        Yii::$app->request->post('submit') == 'save&done' ?
+                            $model->status = Profile::STATUS_REVIEW
+                            : $model->status = Profile::STATUS_NEW;
+
+                        if ($model->save()) {
+
+                            $id = Yii::$app->getUser()->getId();
+                            $user = UserFrontend::findIdentity($id);
+                            if ($user->id_profile != $model->id) {
+                                $user->id_profile = $model->id;
+                                $user->save();
+                            }
+
+                            return  Yii::$app->getResponse()->redirect(Url::to(['profile/view']));
+
+                        } else {
+                            Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
+                        }
+                    }
+
+
+                    $specitems = Profile::getSpecsAllWithChoice($model->edu_base);
+
+                    return $this->render('profile', [
+                        'model' => $model,
+                        'specitems' => $specitems,
+                    ]);
+
+                } else {
+
+                    throw new \yii\web\ForbiddenHttpException('Ваша анкета рассмотрена и принята. Вносить изменения не разрешено. Для исправления данных Вам необходимо обратиться в приемную комиссию.');
+
+                }
+
+            } else {
+                throw new \yii\web\NotFoundHttpException('Анкета не найдена');
+            }
+
+        }
+
     }
 
     /**
@@ -164,10 +245,10 @@ class ProfileController extends Controller
         $user = UserFrontend::findIdentity($id);
         $profile = Profile::findById($user->id_profile);
 
-        if (in_array($profile->status, [Profile::STATUS_REVIEW])) {
+        if (in_array($profile->status, [Profile::STATUS_REVIEW, Profile::STATUS_NEW])) {
 
             $profile->updateAttributes(['status' => Profile::STATUS_NEW]);
-            return  Yii::$app->getResponse()->redirect(Url::to(['profile/my']));
+            return  Yii::$app->getResponse()->redirect(Url::to(['profile/edit']));
 
         } else {
             Yii::$app->session->setFlash('warning', 'С текущим статусом заявления его вернуть не получится.');

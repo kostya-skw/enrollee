@@ -7,6 +7,7 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
+use yii\helpers\Url;
 use frontend\assets\MaterialAsset;
 use common\widgets\Alert;
 
@@ -46,7 +47,7 @@ MaterialAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => \Yii::$app->name.'::'.$this->title,
+        'brandLabel' => \Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -54,13 +55,13 @@ MaterialAsset::register($this);
     ]);
     $menuItems = [
         ['label' => '<span class="glyphicon glyphicon-home"></span> Home', 'url' => ['/site/index']],
-        ['label' => '<span class="glyphicon glyphicon-phone-alt"></span> Политика конфидициальности', 'url' => ['/site/confidential']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => '<span class="glyphicon glyphicon-plus-sign"></span> Signup', 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => '<span class="glyphicon glyphicon-user"></span> Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => '<span class="glyphicon glyphicon-plus-sign"></span> Регистрация', 'url' => ['/site/signup']];
+        $menuItems[] = ['label' => '<span class="glyphicon glyphicon-user"></span> Войти', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => '<span class=""></span> Анкета', 'url' => ['/profile/my']];
+        $menuItems[] = ['label' => 'Соглашение', 'url' => ['/profile/agreement']];
+        $menuItems[] = ['label' => '<span class=""></span> Анкета', 'url' => ['/profile/index']];
         $menuItems[] = ['label' => '<span class="glyphicon glyphicon-user"></span> '.Yii::$app->user->identity->username, 'items' => [
             ['label' => '<span class="glyphicon glyphicon-"></span> User settings', 'url' => ['/site/user-settings']],
             [
@@ -93,7 +94,7 @@ MaterialAsset::register($this);
     <div class="container">
         <p class="pull-left">&copy; Марийский радиомеханический техникум <?= date('Y') ?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right"><a href="<?= Url::to(['site/confidential'], true) ?>">Политика конфидициальности</a></p>
     </div>
 </footer>
 

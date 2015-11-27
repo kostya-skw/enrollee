@@ -225,6 +225,9 @@ class Profile extends \yii\db\ActiveRecord
             $this->created_at= $profile->created_at;
             $this->updated_at= $profile->updated_at;
             $this->attributes = $profile->attributes;
+            return true;
+        } else {
+            return false;
         }
 
     }

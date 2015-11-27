@@ -11,11 +11,13 @@ $this->title = 'Приветствуем Вас!';
         <h1>Приветствуем Вас!</h1>
 
         <p class="lead">Вы попали в он-лайн систему для заполнения анкеты абитуриента.</p>
+        <?php if (Yii::$app->user->isGuest) { ?>
         <p>
             <a class="btn btn-lg btn-success" href="<?php echo Url::to(['site/signup'], true) ?>">Начать регистрацию</a>
             ИЛИ
             <a class="btn btn-lg btn-info" href="<?php echo Url::to(['site/login'], true) ?>">Войти</a>
         </p>
+        <?php } ?>
     </div>
 
     <div class="body-content">

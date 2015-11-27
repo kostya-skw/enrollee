@@ -12,13 +12,14 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 
-$this->title = 'Завяление ';
+$this->title = 'Анкета абитуриента';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="col-lg-9">
 
 
-<h1>Заявление</h1>
+<h1>Анкета убитуриента</h1>
 <h2>Персональная информация</h2>
 <?php echo DetailView::widget([
     'model' => $model,

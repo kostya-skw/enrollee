@@ -11,7 +11,11 @@ use yii\base\Model;
 use Yii;
 
 /**
- * Signup form
+ * @property integer $consent_processing_personal_data
+ */
+
+/**
+ * Agreement form
  */
 class Agreement extends Model
 {
@@ -52,7 +56,7 @@ class Agreement extends Model
         $user = UserFrontend::findIdentity($id);
 
         if ($this->validate()and(!empty($user))) {
-            $user->consent_processing_personal_data = 1;
+            $user->consent_processing_personal_data = $this->consent_processing_personal_data;
             if ($user->save()) {
                 return $user;
             }

@@ -10,6 +10,8 @@ use \common\models\ProfileForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\ProfileForm */
 /* @var $form ActiveForm */
+$this->title = 'Анкета абитуриента';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <style>
     .AbiturApplication h4 {

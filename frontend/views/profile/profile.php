@@ -10,7 +10,11 @@ use \common\models\ProfileForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\ProfileForm */
 /* @var $form ActiveForm */
+
+$this->title = 'Анкета абитуриента';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <style>
     h4.header {
         margin-top: 3rem;
@@ -20,7 +24,7 @@ use \common\models\ProfileForm;
     }
 </style>
 <div class="profile">
-    <h2>Заявление абитуриента</h2>
+    <h2>Анкета абитуриента</h2>
 
     <?php $form = ActiveForm::begin(['enableClientValidation'=>true]); ?>
     <div>

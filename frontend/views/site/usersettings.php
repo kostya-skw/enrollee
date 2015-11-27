@@ -18,10 +18,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'username') ?>
 
+                Для смены пароля:
+
                 <?= $form->field($model, 'password')->passwordInput() ?>
 
                 <div class="form-group">
-                    <?= Html::submitButton('Update', ['class' => 'btn btn-primary', 'name' => 'update-button']) ?>
+                    <?= Html::submitButton('Обновить', ['class' => 'btn btn-primary', 'name' => 'update-button']) ?>
                 </div>
 
             <?php ActiveForm::end(); ?>

@@ -69,7 +69,6 @@ class UserFrontend extends ActiveRecord implements IdentityInterface
      * Get Person.
      * @return Person
      */
-
     public function getProfile()
     {
         return $this->hasOne(Profile::className(), ['id' => 'id_profile']);
