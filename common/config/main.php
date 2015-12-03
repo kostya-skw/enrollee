@@ -3,7 +3,7 @@
 return [
     'name'=>'Абитуриент',
     'language' => 'ru-RU',
-    'sourceLanguage' => 'ru-RU',
+    'sourceLanguage' => 'en',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
         'cache' => [
@@ -13,7 +13,7 @@ return [
             'translations' => [
                 '*'=> [
                     'class' => 'yii\i18n\PhpMessageSource',
-                    'forceTranslation'=>true,
+//                    'forceTranslation'=>true,
                 ]
             ]
 
