@@ -180,53 +180,54 @@ class ProfileController extends Controller
         } else {
 
             $profile = new Profile();
-            if ($profile->loadModel($user->id_profile)) {
+//            if ($profile->loadModel($user->id_profile)) {
+            $profile->loadModel($user->id_profile);
 
-                if (in_array($profile->status, [Profile::STATUS_NEW])) {
+            if (in_array($profile->status, [Profile::STATUS_NEW])) {
 
-                    $model = new ProfileForm();
-                    $model->contact_email = $user->email;
-                    $model->loadModel($profile->id);
+                $model = new ProfileForm();
+                $model->contact_email = $user->email;
+                $model->loadModel($profile->id);
 
-                    if ($model->load(Yii::$app->request->post())) {
+                if ($model->load(Yii::$app->request->post())) {
 
-                        Yii::$app->request->post('submit') == 'save&done' ?
-                            $model->status = Profile::STATUS_REVIEW
-                            : $model->status = Profile::STATUS_NEW;
+                    Yii::$app->request->post('submit') == 'save&done' ?
+                        $model->status = Profile::STATUS_REVIEW
+                        : $model->status = Profile::STATUS_NEW;
 
-                        if ($model->save()) {
+                    if ($model->save()) {
 
-                            $id = Yii::$app->getUser()->getId();
-                            $user = UserFrontend::findIdentity($id);
-                            if ($user->id_profile != $model->id) {
-                                $user->id_profile = $model->id;
-                                $user->save();
-                            }
-
-                            return  Yii::$app->getResponse()->redirect(Url::to(['profile/view']));
-
-                        } else {
-                            Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
+                        $id = Yii::$app->getUser()->getId();
+                        $user = UserFrontend::findIdentity($id);
+                        if ($user->id_profile != $model->id) {
+                            $user->id_profile = $model->id;
+                            $user->save();
                         }
+
+                        return  Yii::$app->getResponse()->redirect(Url::to(['profile/view']));
+
+                    } else {
+                        Yii::$app->session->setFlash('warning', 'Упс, что-то пошло не так. Ты можешь проверить введенные данные, вдруг в них закралась ошибка!');
                     }
-
-
-                    $specitems = Profile::getSpecsAllWithChoice($model->edu_base);
-
-                    return $this->render('profile', [
-                        'model' => $model,
-                        'specitems' => $specitems,
-                    ]);
-
-                } else {
-
-                    throw new \yii\web\ForbiddenHttpException('Ваша анкета рассмотрена и принята. Вносить изменения не разрешено. Для исправления данных Вам необходимо обратиться в приемную комиссию.');
-
                 }
 
+
+                $specitems = Profile::getSpecsAllWithChoice($model->edu_base);
+
+                return $this->render('profile', [
+                    'model' => $model,
+                    'specitems' => $specitems,
+                ]);
+
             } else {
-                throw new \yii\web\NotFoundHttpException('Анкета не найдена');
+
+                throw new \yii\web\ForbiddenHttpException('Ваша анкета рассмотрена и принята. Вносить изменения не разрешено. Для исправления данных Вам необходимо обратиться в приемную комиссию.');
+
             }
+
+//            } else {
+//                throw new \yii\web\NotFoundHttpException('Анкета не найдена');
+//            }
 
         }
 
